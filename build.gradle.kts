@@ -35,7 +35,7 @@ dependencies {
     runtimeOnly("com.fasterxml.jackson.module:jackson-module-kotlin")
 
     testImplementation("io.micronaut:micronaut-http-client")
-
+    testImplementation("org.mockito:mockito-core:4.3.1")
 }
 
 
@@ -69,11 +69,21 @@ sourceSets {
 
 protobuf {
     protoc {
-        artifact = "com.google.protobuf:protoc:3.17.2"
+        artifact = if (project.hasProperty("protocPlatform")) {
+            val protocPlatform= project.properties["protocPlatform"]
+            "com.google.protobuf:protoc:3.17.2:${protocPlatform}"
+        } else {
+            "com.google.protobuf:protoc:3.17.2"
+        }
     }
     plugins {
         id("grpc") {
-            artifact = "io.grpc:protoc-gen-grpc-java:1.39.0"
+            artifact = if (project.hasProperty("protocPlatform")) {
+                val protocPlatform= project.properties["protocPlatform"]
+                "io.grpc:protoc-gen-grpc-java:1.39.0:${protocPlatform}"
+            } else {
+                "io.grpc:protoc-gen-grpc-java:1.39.0"
+            }
         }
     }
     generateProtoTasks {
