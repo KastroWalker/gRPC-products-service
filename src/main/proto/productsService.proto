@@ -6,7 +6,7 @@ option java_package = "dev.kastro";
 package dev.kastro;
 
 service ProductsService {
-  rpc send (ProductServiceRequest) returns (ProductServiceResponse) {}
+  rpc create (ProductServiceRequest) returns (ProductServiceResponse) {}
 }
 
 message ProductServiceRequest {
