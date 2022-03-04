@@ -1,6 +1,6 @@
 package dev.kastro.resource
 
-import dev.kastro.FindByIdServiceRequest
+import dev.kastro.RequestById
 import dev.kastro.ProductServiceRequest
 import dev.kastro.ProductServiceUpdateRequest
 import dev.kastro.ProductsServiceGrpc.ProductsServiceBlockingStub
@@ -40,7 +40,7 @@ internal class ProductResourceTestIT(
 
     @Test
     fun `when ProductsServiceGrpc findById method is call with valid id a success is returned`() {
-        val request = FindByIdServiceRequest.newBuilder()
+        val request = RequestById.newBuilder()
             .setId(1)
             .build()
 
@@ -52,7 +52,7 @@ internal class ProductResourceTestIT(
 
     @Test
     fun `when ProductsServiceGrpc findById method is call with invalid id a ProductNotFoundException is returned`() {
-        val request = FindByIdServiceRequest.newBuilder()
+        val request = RequestById.newBuilder()
             .setId(10)
             .build()
 
