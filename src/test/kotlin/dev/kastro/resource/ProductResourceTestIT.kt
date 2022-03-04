@@ -1,5 +1,6 @@
 package dev.kastro.resource
 
+import dev.kastro.Empty
 import dev.kastro.ProductServiceRequest
 import dev.kastro.ProductServiceUpdateRequest
 import dev.kastro.ProductsServiceGrpc.ProductsServiceBlockingStub
@@ -159,5 +160,15 @@ internal class ProductResourceTestIT(
 
         assertEquals(Status.NOT_FOUND.code, response.status.code)
         assertEquals(description, response.status.description)
+    }
+
+    @Test
+    fun `when ProductsServiceGrpc findAll method is call a list of ProductServiceResponse is returned`() {
+        val request = Empty.newBuilder().build()
+
+        val response = productsServiceBlockingStub.findAll(request)
+
+        assertEquals("Product A", response.getProducts(0).name)
+        assertEquals("Product B", response.getProducts(1).name)
     }
 }

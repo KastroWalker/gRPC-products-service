@@ -2,11 +2,11 @@ package dev.kastro.service.impl
 
 import dev.kastro.domain.Product
 import dev.kastro.dto.ProductReq
+import dev.kastro.dto.ProductRes
 import dev.kastro.dto.ProductUpdateReq
 import dev.kastro.exceptions.AlreadyExistsException
 import dev.kastro.exceptions.ProductNotFoundException
 import dev.kastro.repository.ProductRepository
-import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertThrowsExactly
 import org.junit.jupiter.api.Test
@@ -44,7 +44,7 @@ internal class ProductServiceImplTest {
 
         val productReq = ProductReq(name = "product name", price = 10.00, quantityInStock = 5)
 
-        Assertions.assertThrowsExactly(AlreadyExistsException::class.java) {
+        assertThrowsExactly(AlreadyExistsException::class.java) {
             productService.create((productReq))
         }
     }
@@ -59,7 +59,7 @@ internal class ProductServiceImplTest {
 
         val productReq = ProductUpdateReq(id = 1L, name = "product name", price = 10.00, quantityInStock = 5)
 
-        Assertions.assertThrowsExactly(AlreadyExistsException::class.java) {
+        assertThrowsExactly(AlreadyExistsException::class.java) {
             productService.update((productReq))
         }
     }
@@ -82,7 +82,7 @@ internal class ProductServiceImplTest {
     fun `when findById method is call with invalid id, throws ProductNotFoundException`() {
         val id = 1L
 
-        Assertions.assertThrowsExactly(ProductNotFoundException::class.java) {
+        assertThrowsExactly(ProductNotFoundException::class.java) {
             productService.findById(id)
         }
     }
@@ -109,7 +109,7 @@ internal class ProductServiceImplTest {
     fun `when update method is call with invalid id, throws ProductNotFoundException`() {
         val productReq = ProductUpdateReq(id = 1L, name = "product name", price = 10.00, quantityInStock = 5)
 
-        Assertions.assertThrowsExactly(ProductNotFoundException::class.java) {
+        assertThrowsExactly(ProductNotFoundException::class.java) {
             productService.update(productReq)
         }
     }
@@ -127,7 +127,7 @@ internal class ProductServiceImplTest {
         }
     }
 
-        @Test
+    @Test
     fun `when delete method is call with invalid id, throws ProductNotFoundException`() {
         val id = 1L
 
@@ -137,5 +137,29 @@ internal class ProductServiceImplTest {
         assertThrowsExactly(ProductNotFoundException::class.java) {
             productService.delete(id)
         }
+    }
+
+    @Test
+    fun `when findAll method is call a list of ProductRes is returned`() {
+        val productList = listOf(Product(id = 1, name = "product name", price = 10.00, quantityInStock = 5))
+
+        `when`(productRepository.findAll())
+            .thenReturn(productList)
+
+        val productRes = productService.findAll()
+
+        assertEquals(productList[0].name, productRes[0].name)
+    }
+
+    @Test
+    fun `when findAll method is call without products an emptyList of ProductRes is returned`() {
+        val productList = emptyList<ProductRes>()
+
+        `when`(productRepository.findAll())
+            .thenReturn(emptyList())
+
+        val productRes = productService.findAll()
+
+        assertEquals(productList.size, productRes.size)
     }
 }
