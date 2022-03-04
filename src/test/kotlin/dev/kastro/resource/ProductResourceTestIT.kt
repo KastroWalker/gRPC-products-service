@@ -24,7 +24,7 @@ internal class ProductResourceTestIT(
 
         val response = productsServiceBlockingStub.create(request)
 
-        assertEquals(1, response.id)
+        assertEquals(2, response.id)
         assertEquals("product name", response.name)
     }
 
@@ -54,5 +54,21 @@ internal class ProductResourceTestIT(
 
         assertEquals(Status.NOT_FOUND.code, response.status.code)
         assertEquals(description, response.status.description)
+    }
+
+    @Test
+    fun `when ProductsServiceGrpc create method is call with invalid data a AlreadyExistsException is returned`() {
+        val request = ProductServiceRequest.newBuilder()
+            .setName("Product A")
+            .setPrice(10.0)
+            .setQuantityInStock(10)
+            .build()
+
+        val response = Assertions.assertThrows(StatusRuntimeException::class.java) {
+            productsServiceBlockingStub.create(request)
+        }
+
+        assertEquals(Status.ALREADY_EXISTS.code, response.status.code)
+        assertEquals("Product ${request.name} already exists", response.status.description)
     }
 }
