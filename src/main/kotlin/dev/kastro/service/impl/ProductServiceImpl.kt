@@ -20,6 +20,11 @@ class ProductServiceImpl(
         return productSaved.toProductRes()
     }
 
+    override fun findById(id: Long): ProductRes {
+        val findById = productRepository.findById(id)
+        return findById.get().toProductRes()
+    }
+
     private fun verifyName(name: String) {
         productRepository.findByNameIgnoreCase(name)?.let {
             throw AlreadyExistsException(name)

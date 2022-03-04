@@ -1,5 +1,6 @@
 package dev.kastro.resource
 
+import dev.kastro.FindByIdServiceRequest
 import dev.kastro.ProductServiceRequest
 import dev.kastro.ProductServiceResponse
 import dev.kastro.ProductsServiceGrpc
@@ -36,5 +37,18 @@ class ProductResource(private val productService: ProductService) : ProductsServ
                     .asRuntimeException()
             )
         }
+    }
+
+    override fun findById(request: FindByIdServiceRequest?, responseObserver: StreamObserver<ProductServiceResponse>?) {
+        val productRes = productService.findById(request!!.id)
+        val productResponse = ProductServiceResponse.newBuilder()
+            .setId(productRes.id)
+            .setName(productRes.name)
+            .setPrice(productRes.price)
+            .setQuantityInStock(productRes.quantityInStock)
+            .build()
+
+        responseObserver?.onNext(productResponse)
+        responseObserver?.onCompleted()
     }
 }
