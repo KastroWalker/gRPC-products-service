@@ -2,6 +2,7 @@ package dev.kastro.service.impl
 
 import dev.kastro.domain.Product
 import dev.kastro.dto.ProductReq
+import dev.kastro.dto.ProductUpdateReq
 import dev.kastro.exceptions.AlreadyExistsException
 import dev.kastro.exceptions.ProductNotFoundException
 import dev.kastro.repository.ProductRepository
@@ -47,6 +48,21 @@ internal class ProductServiceImplTest {
     }
 
     @Test
+    fun `when update method is call with duplicated product-name, throws AlreadyExistsException`() {
+        val productInput = Product(id = null, name = "product name", price = 10.00, quantityInStock = 5)
+        val productOutput = Product(id = 1, name = "product name", price = 10.00, quantityInStock = 5)
+
+        `when`(productRepository.findByNameIgnoreCase(productInput.name))
+            .thenReturn(productOutput)
+
+        val productReq = ProductUpdateReq(id = 1L, name = "product name", price = 10.00, quantityInStock = 5)
+
+        Assertions.assertThrowsExactly(AlreadyExistsException::class.java) {
+            productService.update((productReq))
+        }
+    }
+
+    @Test
     fun `when findById method is call with valid id a ProductRes is returned`() {
         val productInput = 1L
         val productOutput = Product(id = 1, name = "product name", price = 10.00, quantityInStock = 5)
@@ -66,6 +82,33 @@ internal class ProductServiceImplTest {
 
         Assertions.assertThrowsExactly(ProductNotFoundException::class.java) {
             productService.findById(id)
+        }
+    }
+
+    @Test
+    fun `when update method is call with data a ProductRes is returned`() {
+        val productInput = Product(id = 1, name = "updated product", price = 11.00, quantityInStock = 6)
+        val findByIdOutput = Product(id = 1, name = "product name", price = 10.00, quantityInStock = 5)
+
+        `when`(productRepository.findById(productInput.id!!))
+            .thenReturn(Optional.of(findByIdOutput))
+
+        `when`(productRepository.update(productInput))
+            .thenReturn(productInput)
+
+        val productReq = ProductUpdateReq(id = 1, name = "updated product", price = 11.00, quantityInStock = 6)
+
+        val productRes = productService.update(productReq)
+
+        assertEquals(productReq.name, productRes.name)
+    }
+
+    @Test
+    fun `when update method is call with invalid id, throws ProductNotFoundException`() {
+        val productReq = ProductUpdateReq(id = 1L, name = "product name", price = 10.00, quantityInStock = 5)
+
+        Assertions.assertThrowsExactly(ProductNotFoundException::class.java) {
+            productService.update(productReq)
         }
     }
 }
