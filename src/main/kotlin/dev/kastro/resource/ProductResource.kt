@@ -94,4 +94,19 @@ class ProductResource(private val productService: ProductService) : ProductsServ
             )
         }
     }
+
+    override fun delete(request: RequestById?, responseObserver: StreamObserver<Empty>?) {
+        try {
+            productService.delete(request!!.id)
+            responseObserver?.onNext(Empty.newBuilder().build())
+            responseObserver?.onCompleted()
+        } catch (ex: BaseBusinessException) {
+            responseObserver?.onError(
+                ex.statusCode()
+                    .toStatus()
+                    .withDescription(ex.errorMessage())
+                    .asRuntimeException()
+            )
+        }
+    }
 }
