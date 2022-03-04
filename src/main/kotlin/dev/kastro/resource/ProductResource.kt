@@ -61,14 +61,16 @@ class ProductResource(private val productService: ProductService) : ProductsServ
     }
 
     override fun update(
-        request: ProductServiceUpdateResponse?,
+        request: ProductServiceUpdateRequest?,
         responseObserver: StreamObserver<ProductServiceResponse>?
     ) {
+        val payload = ValidationUtil.validateUpdatePayload(request)
+
         val productReq = ProductUpdateReq(
-            id = request!!.id,
-            name = request.name,
-            price = request.price,
-            quantityInStock = request.quantityInStock
+            id = payload.id,
+            name = payload.name,
+            price = payload.price,
+            quantityInStock = payload.quantityInStock
         )
 
         val productRes = productService.update(productReq)
