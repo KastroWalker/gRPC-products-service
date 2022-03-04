@@ -1,10 +1,8 @@
 package dev.kastro.resource
 
-import dev.kastro.FindByIdServiceRequest
-import dev.kastro.ProductServiceRequest
-import dev.kastro.ProductServiceResponse
-import dev.kastro.ProductsServiceGrpc
+import dev.kastro.*
 import dev.kastro.dto.ProductReq
+import dev.kastro.dto.ProductUpdateReq
 import dev.kastro.exceptions.BaseBusinessException
 import dev.kastro.service.ProductService
 import dev.kastro.util.ValidationUtil
@@ -60,5 +58,29 @@ class ProductResource(private val productService: ProductService) : ProductsServ
                     .asRuntimeException()
             )
         }
+    }
+
+    override fun update(
+        request: ProductServiceUpdateResponse?,
+        responseObserver: StreamObserver<ProductServiceResponse>?
+    ) {
+        val productReq = ProductUpdateReq(
+            id = request!!.id,
+            name = request.name,
+            price = request.price,
+            quantityInStock = request.quantityInStock
+        )
+
+        val productRes = productService.update(productReq)
+
+        val productResponse = ProductServiceResponse.newBuilder()
+            .setId(productRes.id)
+            .setName(productRes.name)
+            .setPrice(productRes.price)
+            .setQuantityInStock(productRes.quantityInStock)
+            .build()
+
+        responseObserver?.onNext(productResponse)
+        responseObserver?.onCompleted()
     }
 }

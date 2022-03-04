@@ -2,6 +2,7 @@ package dev.kastro.service.impl
 
 import dev.kastro.dto.ProductReq
 import dev.kastro.dto.ProductRes
+import dev.kastro.dto.ProductUpdateReq
 import dev.kastro.exceptions.AlreadyExistsException
 import dev.kastro.exceptions.ProductNotFoundException
 import dev.kastro.repository.ProductRepository
@@ -17,7 +18,6 @@ class ProductServiceImpl(
     override fun create(req: ProductReq): ProductRes {
         verifyName(req.name)
         val productSaved = productRepository.save(req.toDomain())
-
         return productSaved.toProductRes()
     }
 
@@ -27,6 +27,20 @@ class ProductServiceImpl(
             ProductNotFoundException(id)
         }
         return findById.get().toProductRes()
+    }
+
+    override fun update(req: ProductUpdateReq): ProductRes {
+        verifyName(req.name)
+        val product = productRepository.findById(req.id)
+            .orElseThrow {
+                ProductNotFoundException(req.id)
+            }
+        val copy = product.copy(
+            name = req.name,
+            price = req.price,
+            quantityInStock = req.quantityInStock
+        )
+        return productRepository.update(copy).toProductRes()
     }
 
     private fun verifyName(name: String) {
