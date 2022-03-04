@@ -1,6 +1,7 @@
 package dev.kastro.util
 
 import dev.kastro.ProductServiceRequest
+import dev.kastro.exceptions.InvalidArgumentException
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 
@@ -19,7 +20,7 @@ class ValidationUtilTest {
     fun `when validatePayload is call with invalid product name, should throw exception`() {
         val request = ProductServiceRequest.newBuilder().setName("").setPrice(10.0).setQuantityInStock(10).build()
 
-        Assertions.assertThrowsExactly(java.lang.IllegalArgumentException::class.java) {
+        Assertions.assertThrowsExactly(InvalidArgumentException::class.java) {
             ValidationUtil.validatePayload(request)
         }
     }
@@ -29,14 +30,14 @@ class ValidationUtilTest {
         val request =
             ProductServiceRequest.newBuilder().setName("product name").setPrice(-10.0).setQuantityInStock(10).build()
 
-        Assertions.assertThrowsExactly(java.lang.IllegalArgumentException::class.java) {
+        Assertions.assertThrowsExactly(InvalidArgumentException::class.java) {
             ValidationUtil.validatePayload(request)
         }
     }
 
     @Test
     fun `when validatePayload is call with null payload, should throw exception`() {
-        Assertions.assertThrowsExactly(java.lang.IllegalArgumentException::class.java) {
+        Assertions.assertThrowsExactly(InvalidArgumentException::class.java) {
             ValidationUtil.validatePayload(null)
         }
     }

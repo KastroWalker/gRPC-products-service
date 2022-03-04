@@ -1,21 +1,22 @@
 package dev.kastro.util
 
 import dev.kastro.ProductServiceRequest
+import dev.kastro.exceptions.InvalidArgumentException
 
 class ValidationUtil {
     companion object {
         fun validatePayload(payload: ProductServiceRequest?): ProductServiceRequest {
             payload?.let {
                 if (it.name.isNullOrBlank())
-                    throw IllegalArgumentException("Name cannot be null or empty")
+                    throw InvalidArgumentException("name")
 
                 if (it.price.isNaN() || it.price < 0)
-                    throw IllegalArgumentException("Price should be a number")
+                    throw InvalidArgumentException("price")
 
                 return it
             }
 
-            throw IllegalArgumentException()
+            throw InvalidArgumentException("payload")
         }
     }
 }
