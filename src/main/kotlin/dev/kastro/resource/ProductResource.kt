@@ -40,15 +40,25 @@ class ProductResource(private val productService: ProductService) : ProductsServ
     }
 
     override fun findById(request: FindByIdServiceRequest?, responseObserver: StreamObserver<ProductServiceResponse>?) {
-        val productRes = productService.findById(request!!.id)
-        val productResponse = ProductServiceResponse.newBuilder()
-            .setId(productRes.id)
-            .setName(productRes.name)
-            .setPrice(productRes.price)
-            .setQuantityInStock(productRes.quantityInStock)
-            .build()
+        try {
 
-        responseObserver?.onNext(productResponse)
-        responseObserver?.onCompleted()
+            val productRes = productService.findById(request!!.id)
+            val productResponse = ProductServiceResponse.newBuilder()
+                .setId(productRes.id)
+                .setName(productRes.name)
+                .setPrice(productRes.price)
+                .setQuantityInStock(productRes.quantityInStock)
+                .build()
+
+            responseObserver?.onNext(productResponse)
+            responseObserver?.onCompleted()
+        } catch (ex: BaseBusinessException) {
+            responseObserver?.onError(
+                ex.statusCode()
+                    .toStatus()
+                    .withDescription(ex.errorMessage())
+                    .asRuntimeException()
+            )
+        }
     }
 }
