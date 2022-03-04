@@ -2,7 +2,9 @@ package dev.kastro.service.impl
 
 import dev.kastro.domain.Product
 import dev.kastro.dto.ProductReq
+import dev.kastro.exceptions.AlreadyExistsException
 import dev.kastro.repository.ProductRepository
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito
@@ -25,5 +27,20 @@ internal class ProductServiceImplTest {
         val productRes = productService.create(productReq)
 
         assertEquals(productReq.name, productRes.name)
+    }
+
+    @Test
+    fun `when create method is call with duplicated product-name, throws AlreadyExistsException`() {
+        val productInput = Product(id = null, name = "product name", price = 10.00, quantityInStock = 5)
+        val productOutput = Product(id = 1, name = "product name", price = 10.00, quantityInStock = 5)
+
+        `when`(productRepository.findByNameIgnoreCase(productInput.name))
+            .thenReturn(productOutput)
+
+        val productReq = ProductReq(name = "product name", price = 10.00, quantityInStock = 5)
+
+        Assertions.assertThrowsExactly(AlreadyExistsException::class.java) {
+            productService.create((productReq))
+        }
     }
 }
